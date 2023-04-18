@@ -1,9 +1,7 @@
 from pprint import pprint
-
 from database.db_connection import InfluxDBConnection
-
 from utils.testbed_data import TestbedData
-
+from utils.list_utils import sequential_values
 from data_collector import (
     TestbedClientsDataCollector,
     TestbedServersDataCollector
@@ -194,19 +192,33 @@ class TestbedMoteCollectorTest:
     def test_ack_packets(self, id):
         print(f'\n* TEST {id}: get_ack_packets(addr, peer)\n')
 
+        tests = []
+
         for mote in self.clientList:
             print(f'clients.get_ack_packets({mote})')
             clientAckpkts = [
-                p['value'] for p in self.clientCollector.get_ack_packets(mote)
+                int(p['value']) for p in self.clientCollector.get_ack_packets(mote)
             ]
             self.clientList[mote]['ack_packets'] = {'all': clientAckpkts}
+
+            tests.append(
+                (not sequential_values(clientAckpkts) and
+                self.clientCollector.get_ack_packets_count(mote) == len(clientAckpkts))
+            )
 
             for peer in self.clientList[mote]['peers']:
                 print(f'clients.get_ack_packets({mote}, {peer})')
                 clientAckpkts = [
-                    p['value'] for p in self.clientCollector.get_ack_packets(mote, peer)
+                    int(p['value']) for p in self.clientCollector.get_ack_packets(mote, peer)
                 ]
                 self.clientList[mote]['ack_packets'][peer] = clientAckpkts
+
+                tests.append(
+                    (not sequential_values(clientAckpkts) and 
+                     self.clientCollector.get_ack_packets_count(mote, peer) == len(clientAckpkts))
+                )
+
+        print('[ OK ]' if all(tests) else '[ FAIL ]')
 
     def test_get_packets_rssi(self, id):
         print(f'\n* TEST {id}: get_packets_rssi(addr, peer)\n')

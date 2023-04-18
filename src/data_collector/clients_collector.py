@@ -37,9 +37,10 @@ class TestbedClientsDataCollector(TestbedMotesDataCollector):
         )
 
         ackpkts = []
-
-        for ack in get_first_occurrences(rxpkts):
-            index, time = ack[0], ack[1]['time']
+    
+        for ack in get_first_occurrences([p['value'] for p in rxpkts]):
+            index = ack[0]
+            time = rxpkts[index]['time']
             ackpkts.append({
                 'time:': time,
                 'value': txpkts[index]['value']
