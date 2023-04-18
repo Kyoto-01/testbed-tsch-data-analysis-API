@@ -20,22 +20,8 @@ class TestbedClientsDataCollector(TestbedMotesDataCollector):
             return: acknowledged packets list.
         '''
 
-        tags = {
-            'addr': moteAddr
-        }
-
-        if peerAddr:
-            tags['peer'] = peerAddr
-
         txpkts = self.get_packets(moteAddr, peerAddr)
-
-        rxpkts = self._testbed.database.select(
-            bucket=self._testbed.name,
-            measurement=self._moteType,
-            field='rx',
-            tags=tags
-        )
-
+        rxpkts = self._get_list('rx', moteAddr, peerAddr)
         ackpkts = []
     
         for ack in get_first_occurrences([p['value'] for p in rxpkts]):
@@ -57,19 +43,45 @@ class TestbedClientsDataCollector(TestbedMotesDataCollector):
             return: number of acknowledged packets.
         '''
 
-        tags = {
-            'addr': moteAddr
-        }
+        data = self._get_number('rx', moteAddr, peerAddr, unique=True)
 
-        if peerAddr:
-            tags['peer'] = peerAddr
+        return data
+    
+    def get_PDRs(
+        self,
+        moteAddr: 'str',
+        peerAddr: 'str' = None
+    ) -> 'list':
+        ''' 
+            return: mote PDRs (Packet Delivery Ratios) over time.
+        '''
 
-        data = self._testbed.database.count(
-            bucket=self._testbed.name,
-            measurement=self._moteType,
-            field='rx',
-            tags=tags,
-            unique=True
-        )
+        data = self._get_list('pdr', moteAddr, peerAddr)
+
+        return data
+
+    def get_PERs(
+        self,
+        moteAddr: 'str',
+        peerAddr: 'str' = None
+    ) -> 'list':
+        ''' 
+            return: mote PERs (Packet Error Ratios) over time.
+        '''
+
+        data = self._get_list('per', moteAddr, peerAddr)
+
+        return data
+
+    def get_delays(
+        self,
+        moteAddr: 'str',
+        peerAddr: 'str' = None
+    ) -> 'list':
+        ''' 
+            return: mote delays over time.
+        '''
+
+        data = self._get_list('delay', moteAddr, peerAddr)
 
         return data

@@ -25,6 +25,62 @@ class TestbedMotesDataCollector:
         self._moteType = moteType
         self._testbed = testbed
 
+    def _get_list(
+        self, 
+        field: 'str',
+        moteAddr: 'str',
+        peerAddr: 'str' = None,
+        unique: 'bool' = False
+    ) -> 'list':
+        ''' 
+            collects a list of values from testbed.
+        '''
+
+        tags = {
+            'addr': moteAddr
+        }
+
+        if peerAddr:
+            tags['peer'] = peerAddr
+
+        data = self._testbed.database.select(
+            bucket=self._testbed.name,
+            measurement=self._moteType,
+            field=field,
+            tags=tags,
+            unique=unique
+        )
+
+        return data
+    
+    def _get_number(
+        self,
+        field: 'str',
+        moteAddr: 'str',
+        peerAddr: 'str' = None,
+        unique: 'bool' = False
+    ):
+        ''' 
+            collects a numeric value from testbed.
+        '''
+
+        tags = {
+            'addr': moteAddr
+        }
+
+        if peerAddr:
+            tags['peer'] = peerAddr
+
+        data = self._testbed.database.count(
+            bucket=self._testbed.name,
+            measurement=self._moteType,
+            field=field,
+            tags=tags,
+            unique=unique
+        )
+
+        return data
+    
     def get_motes(self) -> 'list':
         ''' 
             return: mote list.
@@ -64,19 +120,7 @@ class TestbedMotesDataCollector:
             return: packet list.
         '''
 
-        tags = {
-            'addr': moteAddr
-        }
-
-        if peerAddr:
-            tags['peer'] = peerAddr
-
-        data = self._testbed.database.select(
-            bucket=self._testbed.name,
-            measurement=self._moteType,
-            field='tx',
-            tags=tags
-        )
+        data = self._get_list('tx', moteAddr, peerAddr)
 
         return data
 
@@ -86,23 +130,11 @@ class TestbedMotesDataCollector:
         peerAddr: 'str' = None
     ) -> 'int':
         ''' 
-            return: number of packets \
-                (Tx for clients and Rx for servers).
+            return: number of packets (Tx for clients and 
+            Rx for servers).
         '''
 
-        tags = {
-            'addr': moteAddr
-        }
-
-        if peerAddr:
-            tags['peer'] = peerAddr
-
-        data = self._testbed.database.count(
-            bucket=self._testbed.name,
-            measurement=self._moteType,
-            field='tx',
-            tags=tags
-        )
+        data = self._get_number('tx', moteAddr, peerAddr)
 
         return data
 
@@ -115,19 +147,7 @@ class TestbedMotesDataCollector:
             return: packet lens list.
         '''
 
-        tags = {
-            'addr': moteAddr
-        }
-
-        if peerAddr:
-            tags['peer'] = peerAddr
-
-        data = self._testbed.database.select(
-            bucket=self._testbed.name,
-            measurement=self._moteType,
-            field='datalen',
-            tags=tags
-        )
+        data = self._get_list('datalen', moteAddr, peerAddr)
 
         return data
 
@@ -140,18 +160,19 @@ class TestbedMotesDataCollector:
             return: channels used by packets list.
         '''
 
-        tags = {
-            'addr': moteAddr
-        }
+        data = self._get_list('ch', moteAddr, peerAddr)
 
-        if peerAddr:
-            tags['peer'] = peerAddr
+        return data
 
-        data = self._testbed.database.select(
-            bucket=self._testbed.name,
-            measurement=self._moteType,
-            field='ch',
-            tags=tags
-        )
+    def get_throughput(
+        self,
+        moteAddr: 'str',
+        peerAddr: 'str' = None
+    ):
+        ''' 
+            return: mote throughput per second list.
+        '''
+
+        data = self._get_list('throughput', moteAddr, peerAddr)
 
         return data

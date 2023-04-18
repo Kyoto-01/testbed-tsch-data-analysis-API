@@ -19,18 +19,6 @@ class TestbedServersDataCollector(TestbedMotesDataCollector):
             return: packets rssi list.
         '''
 
-        tags = {
-            'addr': moteAddr
-        }
-
-        if peerAddr:
-            tags['peer'] = peerAddr
-
-        data = self._testbed.database.select(
-            bucket=self._testbed.name,
-            measurement=self._moteType,
-            field='rssi',
-            tags=tags
-        )
+        data = self._get_list('rssi', moteAddr, peerAddr)
 
         return data
