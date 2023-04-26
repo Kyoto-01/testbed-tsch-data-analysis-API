@@ -1,4 +1,4 @@
-from database.db_connection import InfluxDBConnection
+from ..database import InfluxDBConnection
 
 
 class TestbedData:

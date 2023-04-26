@@ -1,4 +1,4 @@
-from utils.testbed_data import TestbedData
+from ..utils import TestbedData
 
 
 class TestbedMotesDataCollector:
@@ -101,12 +101,13 @@ class TestbedMotesDataCollector:
         ''' 
             return: mote peers list.
         '''
-
+        
         data = self._testbed.database.list_tag_values(
             tagkey='peer',
             bucket=self._testbed.name,
             measurement=self._moteType,
-            tags={'addr': moteAddr}
+            tags={'addr': moteAddr},
+            fields=['tx']
         )
 
         return data
@@ -137,7 +138,20 @@ class TestbedMotesDataCollector:
         data = self._get_number('tx', moteAddr, peerAddr)
 
         return data
+    
+    def get_tx_powers(
+        self,
+        moteAddr: 'str',
+        peerAddr: 'str' = None
+    ) -> 'int':
+        ''' 
+            return: tx power list.
+        '''
 
+        data = self._get_list('txpwr', moteAddr, peerAddr)
+
+        return data
+    
     def get_packets_len(
         self,
         moteAddr: 'str',

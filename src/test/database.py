@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 def test():
-    from database.db_connection import InfluxDBConnection
+    from lib.testbed_analysis.database.db_connection import InfluxDBConnection
 
     db = InfluxDBConnection('../config.ini')
 

@@ -1,4 +1,4 @@
-from utils.list_utils import get_first_occurrences
+from lib.testbed_analysis.utils.list_utils import get_first_occurrences
 
 
 def test():

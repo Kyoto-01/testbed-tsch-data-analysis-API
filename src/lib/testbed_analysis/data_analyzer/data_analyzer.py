@@ -9,20 +9,19 @@ class TestbedDataAnalyzer:
     '''
 
     @staticmethod
-    def get_mean(values: 'list[dict]') -> 'int':
+    def get_mean(values: 'list[dict]') -> 'float':
         ''' 
             return: mean value of a set of testbed resource 
             values
         '''
 
-        mean = 0
+        mean = .0
 
         if values:
             for v in values:
-                mean += int(v['value'])  
+                mean += float(v['value'])  
 
             mean /= len(values)
-            mean = int(mean)
 
         return mean
 
@@ -33,26 +32,26 @@ class TestbedDataAnalyzer:
         '''
 
         pktcount = len(pkts)
-        time = (pkts[pktcount - 1]['time'] - pkts[0]['time'])
+        time = pkts[pktcount - 1]['time'] - pkts[0]['time']
         time = time.total_seconds()
 
         return time
 
     @staticmethod
-    def get_packet_throughput(pkts: 'list') -> 'int':
+    def get_packet_throughput(pkts: 'list') -> 'float':
         ''' 
             return: throughput of a testbed resource in pps 
             (packets per second) 
         '''
 
-        throughput = 0
+        throughput = .0
 
         if pkts:
-            pktnum = len(pkts)
+            pktcount = len(pkts)
             time = TestbedDataAnalyzer.get_uptime(pkts)
 
             # throughput in pps (packets per second)
-            throughput = int(pktnum / time)
+            throughput = pktcount / time
 
         return throughput
 
@@ -62,7 +61,7 @@ class TestbedDataAnalyzer:
             return: packet delivery ratio of a testbed client mote
         '''
 
-        pdr = txcount / rxcount
+        pdr = rxcount / txcount
 
         return pdr
 

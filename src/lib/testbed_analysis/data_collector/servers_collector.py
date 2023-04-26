@@ -1,5 +1,5 @@
-from data_collector.motes_collector import TestbedMotesDataCollector
-from data_collector.motes_collector import TestbedData
+from . import TestbedMotesDataCollector
+from ..utils import TestbedData
 
 
 class TestbedServersDataCollector(TestbedMotesDataCollector):

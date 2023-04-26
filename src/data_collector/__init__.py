@@ -1,3 +1,0 @@
-from data_collector.motes_collector import TestbedMotesDataCollector
-from data_collector.clients_collector import TestbedClientsDataCollector
-from data_collector.servers_collector import TestbedServersDataCollector

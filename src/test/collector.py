@@ -1,8 +1,8 @@
 from pprint import pprint
-from database.db_connection import InfluxDBConnection
-from utils.testbed_data import TestbedData
-from utils.list_utils import sequential_values
-from data_collector import (
+from lib.testbed_analysis.database.db_connection import InfluxDBConnection
+from lib.testbed_analysis import TestbedData
+from lib.testbed_analysis.utils.list_utils import sequential_values
+from lib.testbed_analysis import (
     TestbedClientsDataCollector,
     TestbedServersDataCollector
 )

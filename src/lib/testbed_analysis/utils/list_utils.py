@@ -31,3 +31,12 @@ def get_first_occurrences(
             ret.append((i, v))
 
     return ret
+
+
+def order_by_sublist_index(l: 'list', index: 'int'):
+    return sorted(l, key=lambda x: x[index])
+
+
+def dict_list_values_to_list(d: 'dict'):
+    values = list(d.values())
+    values = [j for i in values for j in i]

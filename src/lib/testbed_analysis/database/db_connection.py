@@ -156,7 +156,8 @@ class InfluxDBConnection:
         tagkey: 'str',
         bucket: 'str',
         measurement: 'str' = None,
-        tags: 'dict' ={}
+        tags: 'dict' = {},
+        fields: 'dict' = []
     ):
         '''
             return: all values of a given tag present in the \
@@ -170,6 +171,9 @@ class InfluxDBConnection:
 
         for k, v in tags.items():
             predicate.append(f'r["{k}"] == "{v}"')
+
+        for i in fields:
+            predicate.append(f'r["_field"] == "{i}"')
 
         predicate = ' and '.join(predicate)
 

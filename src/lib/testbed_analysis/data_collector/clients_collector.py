@@ -1,6 +1,6 @@
-from data_collector.motes_collector import TestbedMotesDataCollector
-from data_collector.motes_collector import TestbedData
-from utils.list_utils import get_first_occurrences
+from ..utils import TestbedData
+from . import TestbedMotesDataCollector
+from ..utils.list_utils import get_first_occurrences
 
 
 class TestbedClientsDataCollector(TestbedMotesDataCollector):
@@ -10,7 +10,7 @@ class TestbedClientsDataCollector(TestbedMotesDataCollector):
         testbed: 'TestbedData'
     ):
         super().__init__('client', testbed)
-
+    
     def get_ack_packets(
         self,
         moteAddr: 'str',
