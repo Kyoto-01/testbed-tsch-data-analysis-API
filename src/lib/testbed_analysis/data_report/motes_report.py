@@ -235,7 +235,7 @@ class TestbedMotesReport(TestbedReport):
             for k, v in counts.items():
                 data = self._get_mean_pktlen(moteAddr)[k]
                 data *= v
-                self._report['count']['pktbit'][k] = data
+                self._report['count']['pktbit'][k] = round(data)
 
         return self._report['count']['pktbit']
     
@@ -256,7 +256,7 @@ class TestbedMotesReport(TestbedReport):
             for peer, count in counts.items():
                 data = self._get_mean_pktlen(moteAddr)[peer]
                 data *= count
-                self._report['count']['ackbit'][peer] = data
+                self._report['count']['ackbit'][peer] = round(data)
 
         return self._report['count']['ackbit']
 

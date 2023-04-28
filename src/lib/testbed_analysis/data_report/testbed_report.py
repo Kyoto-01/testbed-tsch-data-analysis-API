@@ -364,27 +364,67 @@ class TestbedReport(ABC):
         elif title == 'count':
             self._get_report_count(moteAddr, subtitle)
         elif title == 'testbed':
-            self._get_report_testbed(subtitle)
+            self._get_report_testbed(moteAddr, subtitle)
 
+    def _is_topic_valid(self, topic: 'str') -> 'bool':
+        title, subtitle = topic.split('/')[:2]
+
+        return (
+            title != 'date' and
+            title in self._report and 
+            (subtitle in self._report[title] or not subtitle)
+        )
+
+    def _format_report_by_topics(
+        self,
+        topics: 'list[str]'
+    ):
+        report = {}
+
+        report['date'] = self._report['date']
+
+        for topic in topics:
+            if not topic.endswith('/'):
+                topic += '/'
+        
+            title, subtitle = topic.split('/')[:2]
+
+            if self._is_topic_valid(topic):
+                report[title] = {}
+
+                if subtitle:
+                    report[title][subtitle] = self._report[title][subtitle]
+                else:
+                    report[title] = self._report[title]
+        
+        return report
+    
     def get_report_by_topics(
         self,
         moteAddr: 'str',
         topics: 'list[str]'
     ):
         '''
-        topics: a list of topics of the report in the format
-        "title/subtitle" or "title/".
+            topics: a list of topics of the report in the format
+            "title/subtitle" or "title/".
         '''
 
         for topic in topics:
-            title, subtitle = topic.split('/')
-            self._set_report_by_topic(moteAddr, title, subtitle)
+            if not topic.endswith('/'):
+                topic += '/'
+
+            title, subtitle = topic.split('/')[:2]
+
+            if self._is_topic_valid(topic):
+                self._set_report_by_topic(moteAddr, title, subtitle)
 
         self._get_date()
 
-        return self._report
+        report = self._format_report_by_topics(topics)
+
+        return report
     
-    def get_report(
+    def get_full_report(
         self,
         moteAddr: 'str'
     ):

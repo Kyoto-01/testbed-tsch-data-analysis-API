@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import sys
 from pprint import pprint
 
 from lib.testbed_analysis.database import InfluxDBConnection
@@ -27,10 +28,17 @@ clientReport = TestbedClientsReport(testbed)
 serverReport = TestbedServersReport(testbed)
 generalReport = TestbedGeneralReport(testbed)
 
-general = generalReport.get_report(None)
-client = clientReport.get_report('fe8000000000000002124b0014b5d33a')
-server = serverReport.get_report('fe8000000000000002124b0018e0b9f2')
+reportType, reportTopics = sys.argv[1], sys.argv[2].split(',')
+clientMote = 'fe8000000000000002124b0014b5d33a' 
+serverMote = 'fe8000000000000002124b0018e0b9f2'
 
-pprint(general)
-pprint(client)
-pprint(server)
+reportResponse = None
+
+if reportType == 'client':
+    reportResponse = clientReport.get_report_by_topics(clientMote, reportTopics)
+elif reportType == 'server':
+    reportResponse = serverReport.get_report_by_topics(serverMote, reportTopics)
+elif reportType == 'general':
+    reportResponse = generalReport.get_report_by_topics(None, reportTopics)
+
+pprint(reportResponse)
