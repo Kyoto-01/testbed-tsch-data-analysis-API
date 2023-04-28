@@ -33,10 +33,17 @@ def get_first_occurrences(
     return ret
 
 
-def order_by_sublist_index(l: 'list', index: 'int'):
-    return sorted(l, key=lambda x: x[index])
+def order_by_sublist_key(l: 'list', key):
+    return sorted(l, key=lambda x: x[key])
 
 
 def dict_list_values_to_list(d: 'dict'):
-    values = list(d.values())
-    values = [j for i in values for j in i]
+    # values = list(d.values())
+    # values = [j for i in values for j in i]
+
+    values = []
+
+    for v in d.values():
+        values = values + v
+
+    return values

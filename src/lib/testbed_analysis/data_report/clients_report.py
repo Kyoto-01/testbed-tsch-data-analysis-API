@@ -12,12 +12,7 @@ class TestbedClientsReport(TestbedMotesReport):
     ):
         super().__init__('client', testbed)
 
-    def _get_testbed_client(self):
-        if not self._report['testbed']['client']:
-            data = self._collector.get_motes()
-            self._report['testbed']['client'] = data
-
-        return self._report['testbed']['client']
+        self._srvCollector = TestbedServersDataCollector(self._testbed)
 
     def _get_raw_pdr(
         self,
@@ -76,13 +71,12 @@ class TestbedClientsReport(TestbedMotesReport):
         moteAddr: 'str'
     ) -> 'dict':
         if not self._report['raw']['rssi']:
-            srvCollector = TestbedServersDataCollector(self._testbed)
             peers = self._get_general_peer(moteAddr)
 
             for peer in peers:
                 srv = peer.replace('fd00', 'fe80')
                 cli = moteAddr.replace('fe80', 'fd00')
-                data = srvCollector.get_packets_rssi(srv, cli)
+                data = self._srvCollector.get_packets_rssi(srv, cli)
                 self._report['raw']['rssi'][peer] = data
 
         return self._report['raw']['rssi']
@@ -138,88 +132,3 @@ class TestbedClientsReport(TestbedMotesReport):
                 self._report['count']['acked'][peer] = data
 
         return self._report['count']['acked']
-
-    def _get_count_ackbit(
-        self,
-        moteAddr: 'str'
-    ) -> 'dict':
-        if not self._report['count']['ackbit']:
-            counts = self._get_count_acked(moteAddr)
-
-            for peer, count in counts.items():
-                data = self._get_mean_pktlen(moteAddr)[peer]
-                data *= count
-                self._report['count']['ackbit'][peer] = data
-
-        return self._report['count']['ackbit']
-    
-    def _get_report_testbed(
-        self, 
-        subtitle: 'str'
-    ) -> 'dict':
-        super()._get_report_testbed(subtitle)
-
-        if subtitle == 'client':
-            self._get_testbed_client()
-        elif not subtitle:
-            self._get_testbed_client()
-
-        return self._report['testbed'] 
-
-    def _get_report_raw(
-        self,
-        moteAddr: 'str',
-        subtitle: 'str'
-    ) -> 'dict':
-        super()._get_report_raw(moteAddr, subtitle)
-
-        if subtitle == 'pdr':
-            self._get_raw_pdr(moteAddr)
-        elif subtitle == 'per':
-            self._get_raw_per(moteAddr)
-        elif subtitle == 'delay':
-            self._get_raw_delay(moteAddr)
-        elif subtitle == 'acked':
-            self._get_raw_acked(moteAddr)
-        elif not subtitle:
-            self._get_raw_pdr(moteAddr)
-            self._get_raw_per(moteAddr)
-            self._get_raw_delay(moteAddr)
-            self._get_raw_acked(moteAddr)
-
-        return self._report['raw']
-
-    def _get_report_mean(
-        self,
-        moteAddr: 'str',
-        subtitle: 'str'
-    ) -> 'dict':
-        super()._get_report_mean(moteAddr, subtitle)
-
-        if subtitle == 'pdr':
-            self._get_mean_pdr(moteAddr)
-        elif subtitle == 'per':
-            self._get_mean_per(moteAddr)
-        elif subtitle == 'delay':
-            self._get_mean_delay(moteAddr)
-        elif not subtitle:
-            self._get_mean_pdr(moteAddr)
-            self._get_mean_per(moteAddr)
-            self._get_mean_delay(moteAddr)
-
-        return self._report['mean']
-
-    def _get_report_count(
-        self,
-        moteAddr: 'str',
-        subtitle: 'str'
-    ) -> 'dict':
-        if subtitle == 'acked':
-            self._get_count_acked(moteAddr)
-        elif subtitle == 'ackbit':
-            self._get_count_ackbit(moteAddr)
-        elif not subtitle:
-            self._get_count_acked(moteAddr)
-            self._get_count_ackbit(moteAddr)
-
-        return self._report['count']

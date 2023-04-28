@@ -10,6 +10,11 @@ class TestbedClientsDataCollector(TestbedMotesDataCollector):
         testbed: 'TestbedData'
     ):
         super().__init__('client', testbed)
+
+        self._generalCollector = TestbedMotesDataCollector(
+            moteType='client_general', 
+            testbed=self._testbed
+        )
     
     def get_ack_packets(
         self,
@@ -83,5 +88,53 @@ class TestbedClientsDataCollector(TestbedMotesDataCollector):
         '''
 
         data = self._get_list('delay', moteAddr, peerAddr)
+
+        return data
+
+    def get_mean_throughputs(
+        self,
+        moteAddr: 'str'
+    ):
+        ''' 
+            return: mote mean throughputs over time.
+        '''
+
+        data = self._generalCollector._get_list('throughput', moteAddr)
+
+        return data
+
+    def get_mean_PDRs(
+        self,
+        moteAddr: 'str'
+    ):
+        ''' 
+            return: mote mean PDRs over time.
+        '''
+
+        data = self._generalCollector._get_list('pdr', moteAddr)
+
+        return data
+
+    def get_mean_PERs(
+        self,
+        moteAddr: 'str'
+    ):
+        ''' 
+            return: mote mean PERs over time.
+        '''
+
+        data = self._generalCollector._get_list('per', moteAddr)
+
+        return data
+
+    def get_mean_delays(
+        self,
+        moteAddr: 'str'
+    ):
+        ''' 
+            return: mote mean delays over time.
+        '''
+
+        data = self._generalCollector._get_list('delay', moteAddr)
 
         return data

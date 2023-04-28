@@ -32,8 +32,10 @@ class TestbedDataAnalyzer:
         '''
 
         pktcount = len(pkts)
-        time = pkts[pktcount - 1]['time'] - pkts[0]['time']
-        time = time.total_seconds()
+        frstTime = pkts[0]['time'].timestamp()
+        lastTime = pkts[pktcount - 1]['time'].timestamp()
+
+        time = lastTime - frstTime
 
         return time
 
@@ -72,24 +74,36 @@ class TestbedDataAnalyzer:
         '''
 
         per = 1 - TestbedDataAnalyzer.get_PDR(txcount, rxcount)
+        per = .0 if per < 0 else per
 
         return per
 
     @staticmethod
     def get_delay(txpkt: 'dict', rxpkt: 'dict') -> 'float':
         ''' 
-            return: packet delay of a testbed client mote
+            return: packet delay of a testbed client mote in ms
         '''
 
-        delay = rxpkt['time'] - txpkt['time']
-        delay = delay.total_seconds()
+        rxsecs = float(rxpkt['time'].timestamp())
+        txsecs = float(txpkt['time'].timestamp())
+
+        delay = rxsecs - txsecs
+        delay = .0 if delay < .0 else delay
+        delay *= 1000
+
+        # DEBUG LOG
+        # print(
+        #     f'{round(rxsecs * 1000, 1)}'
+        #     f' - {round(txsecs * 1000, 1)}',
+        #     f'  = {round(delay, 1)} ms'
+        # )
 
         return delay
     
     @staticmethod
     def get_delays(txpkts: 'list', rxpkts: 'list') -> 'list':
         ''' 
-            return: packet delays of a testbed client mote
+            return: packet delays of a testbed client mote in ms
             (If Tx packet was lost, delay will be -1).
         '''
 
@@ -97,7 +111,7 @@ class TestbedDataAnalyzer:
         rxpktsValues = [p['value'] for p in rxpkts]
 
         for tx in txpkts:
-            delay = -1
+            delay = -1.
 
             if tx['value'] in rxpktsValues:
                 rx = rxpktsValues.index(tx['value'])

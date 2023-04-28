@@ -1,4 +1,5 @@
 from ..utils import TestbedData
+from ..data_collector import TestbedClientsDataCollector
 from . import TestbedMotesReport
 
 
@@ -10,12 +11,52 @@ class TestbedServersReport(TestbedMotesReport):
     ):
         super().__init__('server', testbed)
 
-    def _get_testbed_server(self):
-        if not self._report['testbed']['server']:
-            data = self._collector.get_motes()
-            self._report['testbed']['server'] = data
+        self._cliCollector = TestbedClientsDataCollector(self._testbed)
 
-        return self._report['testbed']['server']
+    def _get_raw_pdr(
+        self,
+        moteAddr: 'str'
+    ) -> 'dict':
+        if not self._report['raw']['pdr']:
+            peers = self._get_general_peer(moteAddr)
+
+            for peer in peers:
+                cli = peer.replace('fd00', 'fe80')
+                srv = moteAddr.replace('fe80', 'fd00')
+                data = self._cliCollector.get_PDRs(cli, srv)
+                self._report['raw']['pdr'][peer] = data
+
+        return self._report['raw']['pdr']
+
+    def _get_raw_per(
+        self,
+        moteAddr: 'str',
+    ) -> 'dict':
+        if not self._report['raw']['per']:
+            peers = self._get_general_peer(moteAddr)
+
+            for peer in peers:
+                cli = peer.replace('fd00', 'fe80')
+                srv = moteAddr.replace('fe80', 'fd00')
+                data = self._cliCollector.get_PERs(cli, srv)
+                self._report['raw']['per'][peer] = data
+
+        return self._report['raw']['per']
+
+    def _get_raw_delay(
+        self,
+        moteAddr: 'str'
+    ) -> 'dict':
+        if not self._report['raw']['delay']:
+            peers = self._get_general_peer(moteAddr)
+
+            for peer in peers:
+                cli = peer.replace('fd00', 'fe80')
+                srv = moteAddr.replace('fe80', 'fd00')
+                data = self._cliCollector.get_delays(cli, srv)
+                self._report['raw']['delay'][peer] = data
+
+        return self._report['raw']['delay']
 
     def _get_raw_rssi(
         self,
@@ -30,15 +71,32 @@ class TestbedServersReport(TestbedMotesReport):
 
         return self._report['raw']['rssi']
 
-    def _get_report_testbed(
-        self, 
-        subtitle: 'str'
+    def _get_raw_acked(
+        self,
+        moteAddr: 'str'
     ) -> 'dict':
-        super()._get_report_testbed(subtitle)
+        if not self._report['raw']['acked']:
+            peers = self._get_general_peer(moteAddr)
 
-        if subtitle == 'server':
-            self._get_testbed_server()
-        elif not subtitle:
-            self._get_testbed_server()
+            for peer in peers:
+                cli = peer.replace('fd00', 'fe80')
+                srv = moteAddr.replace('fe80', 'fd00')
+                data = self._cliCollector.get_ack_packets(cli, srv)
+                self._report['raw']['acked'][peer] = data
 
-        return self._report['testbed'] 
+        return self._report['raw']['acked']
+    
+    def _get_count_acked(
+        self,
+        moteAddr: 'str'
+    ) -> 'dict':
+        if not self._report['count']['acked']:
+            peers = self._get_general_peer(moteAddr)
+
+            for peer in peers:
+                cli = peer.replace('fd00', 'fe80')
+                srv = moteAddr.replace('fe80', 'fd00')
+                data = self._cliCollector.get_ack_packets_count(cli, srv)
+                self._report['count']['acked'][peer] = data
+
+        return self._report['count']['acked']

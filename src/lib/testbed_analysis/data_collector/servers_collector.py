@@ -10,6 +10,11 @@ class TestbedServersDataCollector(TestbedMotesDataCollector):
     ):
         super().__init__('server', testbed)
 
+        self._generalCollector = TestbedMotesDataCollector(
+            moteType='server_general', 
+            testbed=self._testbed
+        )
+
     def get_packets_rssi(
         self,
         moteAddr: 'str',
@@ -20,5 +25,17 @@ class TestbedServersDataCollector(TestbedMotesDataCollector):
         '''
 
         data = self._get_list('rssi', moteAddr, peerAddr)
+
+        return data
+
+    def get_mean_throughputs(
+        self,
+        moteAddr: 'str'
+    ):
+        ''' 
+            return: mote mean throughputs over time.
+        '''
+
+        data = self._generalCollector._get_list('throughput', moteAddr)
 
         return data

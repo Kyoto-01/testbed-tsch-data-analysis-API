@@ -4,8 +4,6 @@ from lib.testbed_analysis import TestbedServersReport
 from lib.testbed_analysis import TestbedGeneralReport
 from lib.testbed_analysis import TestbedDataAnalyzer
 from lib.testbed_analysis import TestbedDataPersist
-from lib.testbed_analysis.utils import list_utils
-from lib.testbed_analysis import REPORT_FORMAT
 
 
 class TestbedAnalysisRPC:
@@ -16,17 +14,19 @@ class TestbedAnalysisRPC:
     ):
         self._testbed = testbed
         self._dataPersist = TestbedDataPersist(testbed)
+        self._prevClientsTxpktCount = {}
 
     def analyze_clients_throughput(self):
         allReport = TestbedGeneralReport(self._testbed)
+        report = TestbedClientsReport(self._testbed)
         clients = allReport._get_testbed_client()
 
         throughputsGeneral = []
 
         for c in clients:
-            report = TestbedClientsReport(self._testbed)
-            packets = report._get_raw_packet(c)
+            report.reset()
 
+            packets = report._get_raw_packet(c)
             throughputsMote = []
 
             # throughput per link
@@ -49,12 +49,13 @@ class TestbedAnalysisRPC:
 
     def analyze_servers_throughput(self):
         allReport = TestbedGeneralReport(self._testbed)
+        report = TestbedServersReport(self._testbed)
         servers = allReport._get_testbed_server()
 
         for s in servers:
-            report = TestbedServersReport(self._testbed)
-            packets = report._get_raw_packet(s)
+            report.reset()
 
+            packets = report._get_raw_packet(s)
             throughputsMote = []
 
             # throughput per link
@@ -71,11 +72,13 @@ class TestbedAnalysisRPC:
 
     def analyze_clients_pdr(self):
         allReport = TestbedGeneralReport(self._testbed)
+        report = TestbedClientsReport(self._testbed)
         clients = allReport._get_testbed_client()
         pdrsGeneral = []
 
         for c in clients:
-            report = TestbedClientsReport(self._testbed)
+            report.reset()
+
             pktcount = report._get_count_packet(c)
             ackcount = report._get_count_acked(c)
 
@@ -101,11 +104,13 @@ class TestbedAnalysisRPC:
 
     def analyze_clients_per(self):
         allReport = TestbedGeneralReport(self._testbed)
+        report = TestbedClientsReport(self._testbed)
         clients = allReport._get_testbed_client()
         persGeneral = []
 
         for c in clients:
-            report = TestbedClientsReport(self._testbed)
+            report.reset()
+
             pktcount = report._get_count_packet(c)
             ackcount = report._get_count_acked(c)
 
@@ -146,6 +151,9 @@ class TestbedAnalysisRPC:
 
             delaysMote = []
 
+            if not c in self._prevClientsTxpktCount:
+                self._prevClientsTxpktCount[c] = {}
+
             # delays per link
             for p in peers:
                 srvReport.reset()
@@ -155,13 +163,18 @@ class TestbedAnalysisRPC:
                 linkRxpkts = srvReport._get_raw_packet(p.replace('fd00', 'fe80'))
                 linkRxpkts = linkRxpkts[c.replace('fe80', 'fd00')]
 
+                if p not in self._prevClientsTxpktCount[c]:
+                    self._prevClientsTxpktCount[c][p] = 0
+                    
                 data = TestbedDataAnalyzer.get_delays(
-                    linkTxpkts[len(linkPrevDelays):], linkRxpkts
+                    linkTxpkts[self._prevClientsTxpktCount[c][p]:], linkRxpkts
                 )
+
+                self._prevClientsTxpktCount[c][p] = len(linkTxpkts)
 
                 for d in data:
                     delaysMote.append({'value': d})
-                    d = {'delay2': d}
+                    d = {'delay': d}
                     self._dataPersist.persist('client', c, p, d)
 
                 delaysMote = delaysMote + linkPrevDelays
@@ -169,10 +182,10 @@ class TestbedAnalysisRPC:
             # delays per mote
             data = TestbedDataAnalyzer.get_mean(delaysMote)
             delaysGeneral.append({'value': data})
-            data = {'delay2': data}
+            data = {'delay': data}
             self._dataPersist.persist('client_general', c, None, data)
 
         # delays general
         data = TestbedDataAnalyzer.get_mean(delaysGeneral)
-        data = {'delay2': data}
+        data = {'delay': data}
         self._dataPersist.persist('general', None, None, data)

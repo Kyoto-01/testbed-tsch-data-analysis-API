@@ -1,4 +1,5 @@
 from ..utils import TestbedData
+from ..utils.constants import TESTBED_MEASUREMENTS
 
 
 class TestbedMotesDataCollector:
@@ -9,7 +10,7 @@ class TestbedMotesDataCollector:
         ### Attributes
 
         * moteType: Group of motes from which data will be collected \
-            ( client | server ).
+            ( client | server | client_general | server_general | general).
         * testbed: testbed data structure.
     '''
 
@@ -20,7 +21,7 @@ class TestbedMotesDataCollector:
     ):
         moteType = moteType.lower()
 
-        assert moteType in ('client', 'server'), 'Invalid Mote Type.'
+        assert moteType in TESTBED_MEASUREMENTS, 'Invalid Mote Type.'
 
         self._moteType = moteType
         self._testbed = testbed
@@ -30,7 +31,7 @@ class TestbedMotesDataCollector:
         field: 'str',
         moteAddr: 'str',
         peerAddr: 'str' = None,
-        unique: 'bool' = False
+        unique: 'bool' = False,
     ) -> 'list':
         ''' 
             collects a list of values from testbed.
@@ -59,7 +60,7 @@ class TestbedMotesDataCollector:
         moteAddr: 'str',
         peerAddr: 'str' = None,
         unique: 'bool' = False
-    ):
+    ) -> 'int':
         ''' 
             collects a numeric value from testbed.
         '''

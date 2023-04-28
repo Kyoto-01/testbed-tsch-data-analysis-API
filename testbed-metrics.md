@@ -28,7 +28,7 @@
 ### 2.1. Valores Individuais
 
 - Endereço do mote
-- Servidor
+- Pares
 - Tempo de disponibilidade do mote
 - Quantidade de pacotes transmitidos
 - Quantidade de bits transmitidos
@@ -53,20 +53,17 @@
 ### 3.1. Valores Individuais
 
 - Endereço do mote
+- Pares
 - Tempo de disponibilidade do mote
 - Quantidade de pacotes recebidos
 - Quantidade de bits recebidos
 - Média de taxa de recepção
-- Média de RSSI
+- Média de RSSI ***
 
 ### 3.2. Gráficos
 
 - Taxa de recepção por segundo (Selecionar: bits | pacotes) 		                    [ Série Temporal ]
 - RSSI por pacote recebido                                   		                    [ Série Temporal ]
-- Taxa de transferência total dos clientes por segundo (Selecionar: bits | pacotes) 	[ Série Temporal ]
-- Média de PDR dos clientes por segundo                                                 [ Série Temporal ]
-- Média de PER dos clientes por segundo                     			                [ Série Temporal ]
-- Média de latência dos clientes por segundo                                            [ Série Temporal ]
 - Média de taxa de transferência dos clientes							                [ Histograma ]
 - Média de PDR dos clientes 					                                        [ Histograma ]
 - Média de PER dos clientes 					                                        [ Histograma ]

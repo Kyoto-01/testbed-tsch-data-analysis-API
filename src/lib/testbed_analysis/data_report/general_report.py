@@ -1,6 +1,7 @@
 from ..utils import TestbedData
 from ..data_collector import TestbedClientsDataCollector
 from ..data_collector import TestbedServersDataCollector
+from ..data_collector import TestbedGeneralDataCollector
 from ..data_analyzer import TestbedDataAnalyzer
 from . import TestbedReport
 
@@ -15,6 +16,7 @@ class TestbedGeneralReport(TestbedReport):
 
         self._cliCollector = TestbedClientsDataCollector(testbed)
         self._srvCollector = TestbedServersDataCollector(testbed)
+        self._collector = TestbedGeneralDataCollector(testbed)
 
     def _get_testbed_client(self):
         if not self._report['testbed']['client']:
@@ -29,77 +31,6 @@ class TestbedGeneralReport(TestbedReport):
             self._report['testbed']['server'] = data
 
         return self._report['testbed']['server']
-
-    def _get_mean_pdr(
-        self,
-        moteAddr: 'str'
-    ) -> 'dict':
-        if not self._report['mean']['pdr']:
-            pdrs = self._get_raw_pdr(moteAddr)
-
-            for peer, pdr in enumerate(pdrs):
-                data = TestbedDataAnalyzer.get_mean(pdr)
-                self._report['mean']['pdr'][peer] = data
-
-        return self._report['mean']['pdr']
-
-    def _get_mean_per(
-        self,
-        moteAddr: 'str'
-    ) -> 'dict':
-        if not self._report['mean']['per']:
-            pers = self._get_raw_per(moteAddr)
-
-            for peer, per in enumerate(pers):
-                data = TestbedDataAnalyzer.get_mean(per)
-                self._report['mean']['per'][peer] = data
-
-        return self._report['mean']['per']
-
-    def _get_mean_delay(
-        self,
-        moteAddr: 'str'
-    ) -> 'dict':
-        if not self._report['mean']['delay']:
-            delays = self._get_raw_delay(moteAddr)
-
-            for peer, delay in enumerate(delays):
-                data = TestbedDataAnalyzer.get_mean(delay)
-                self._report['mean']['delay'][peer] = data
-
-        return self._report['mean']['delay']
-
-    def _get_count_packet(
-        self,
-        moteAddr: 'str'
-    ) -> 'dict':
-        ...
-
-    def _get_count_acked(
-        self,
-        moteAddr: 'str'
-    ) -> 'dict':
-        ...
-    
-    def _get_count_ackbit(
-        self,
-        moteAddr: 'str'
-    ) -> 'dict':
-        if not self._report['count']['ackbit']:
-            counts = self._get_count_acked(moteAddr)
-
-            for peer, count in counts:
-                data = self._get_mean_pktlen(moteAddr)[peer]
-                data *= count
-                self._report['count']['ackbit'][peer] = data
-
-        return self._report['count']['ackbit']
-    
-    def _get_raw_throughput(
-        self,
-        moteAddr: 'str'
-    ) -> 'dict':
-        pass
 
     def _get_raw_packet(
         self,
@@ -127,117 +58,88 @@ class TestbedGeneralReport(TestbedReport):
 
         return self._report['raw']['packet']
 
-    def _get_raw_pktlen(
+    def _get_raw_throughput(
         self,
         moteAddr: 'str'
     ) -> 'dict':
-        if not self._report['raw']['pktlen']:
-            clients = self._get_testbed_client()
-            servers = self._get_testbed_server()
-
+        if not self._report['raw']['throughput']:
             if moteAddr:
+                clients = self._get_testbed_client()
+                servers = self._get_testbed_server()
+
                 if moteAddr in clients:
-                    data = self._cliCollector.get_packets_len(moteAddr)
-                    self._report['raw']['pktlen'][moteAddr] = data
+                    data = self._cliCollector.get_throughput(moteAddr)
+                    self._report['raw']['throughput'][moteAddr] = data
                 elif moteAddr in servers:
-                    data = self._srvCollector.get_packets_len(moteAddr)
-                    self._report['raw']['pktlen'][moteAddr] = data
-            for c in clients:
-                data = self._cliCollector.get_packets_len(c)
-                self._report['raw']['pktlen'][c] = data
-
-            for s in servers:
-                data = self._srvCollector.get_packets_len(s)
-                self._report['raw']['pktlen'][s] = data
-
-        return self._report['raw']['pktlen']
-
-    def _get_raw_channel(
-        self,
-        moteAddr: 'str'
-    ) -> 'dict':
-        if not self._report['raw']['channel']:
-            clients = self._get_testbed_client()
-            servers = self._get_testbed_server()
-
-            if moteAddr:
-                if moteAddr in clients:
-                    data = self._cliCollector.get_packets_channel(moteAddr)
-                    self._report['raw']['channel'][moteAddr] = data
-                elif moteAddr in servers:
-                    data = self._srvCollector.get_packets_channel(moteAddr)
-                    self._report['raw']['channel'][moteAddr] = data
+                    data = self._srvCollector.get_throughput(moteAddr)
+                    self._report['raw']['throughput'][moteAddr] = data
             else:
-                for c in clients:
-                    data = self._cliCollector.get_packets_channel(c)
-                    self._report['raw']['channel'][c] = data
+                data = self._collector.get_throughputs()
+                self._report['raw']['throughput']['general'] = data
 
-                for s in servers:
-                    data = self._srvCollector.get_packets_channel(s)
-                    self._report['raw']['channel'][s] = data
-
-        return self._report['raw']['channel']
-
-    def _get_raw_txpower(
-        self,
-        moteAddr: 'str'
-    ) -> 'dict':
-        if not self._report['raw']['txpower']:
-            clients = self._get_testbed_client()
-            servers = self._get_testbed_server()
-
-            if moteAddr:
-                if moteAddr in clients:
-                    data = self._cliCollector.get_tx_powers(moteAddr)
-                    self._report['raw']['txpower'][moteAddr] = data
-                elif moteAddr in servers:
-                    data = self._srvCollector.get_tx_powers(moteAddr)
-                    self._report['raw']['txpower'][moteAddr] = data
-            else:
-                for c in clients:
-                    data = self._cliCollector.get_tx_powers(c)
-                    self._report['raw']['txpower'][c] = data
-
-                for s in servers:
-                    data = self._srvCollector.get_tx_powers(s)
-                    self._report['raw']['txpower'][s] = data
-
-        return self._report['raw']['txpower']
-
+        return self._report['raw']['throughput']
+    
     def _get_raw_pdr(
         self,
         moteAddr: 'str'
     ) -> 'dict':
-        if not self._report['raw']['packet']:
-            clients = self._get_testbed_client()
-            servers = self._get_testbed_server()
-
+        if not self._report['raw']['pdr']:
             if moteAddr:
+                clients = self._get_testbed_client()
                 if moteAddr in clients:
-                    data = self._cliCollector.get_packets(moteAddr)
-                    self._report['raw']['packet'][moteAddr] = data
-                elif moteAddr in servers:
-                    data = self._srvCollector.get_packets(moteAddr)
-                    self._report['raw']['packet'][moteAddr] = data
+                    data = self._cliCollector.get_PDRs(moteAddr)
+                    self._report['raw']['pdr'][moteAddr] = data
             else:
-                for c in clients:
-                    data = self._cliCollector.get_packets(c)
-                    self._report['raw']['packet'][c] = data
+                data = self._collector.get_PDRs()
+                self._report['raw']['pdr']['general'] = data
 
-                for s in servers:
-                    data = self._srvCollector.get_packets(s)
-                    self._report['raw']['packet'][s] = data
-
-        return self._report['raw']['packet']
+        return self._report['raw']['pdr']
 
     def _get_raw_per(
         self,
         moteAddr: 'str'
     ) -> 'dict':
-        pass
+        if not self._report['raw']['per']:
+            if moteAddr:
+                clients = self._get_testbed_client()
+                if moteAddr in clients:
+                    data = self._cliCollector.get_PERs(moteAddr)
+                    self._report['raw']['per'][moteAddr] = data
+            else:
+                data = self._collector.get_PERs()
+                self._report['raw']['per']['general'] = data
+
+        return self._report['raw']['per']
 
     def _get_raw_delay(
         self,
         moteAddr: 'str'
     ) -> 'dict':
-        pass
+        if not self._report['raw']['delay']:
+            if moteAddr:
+                clients = self._get_testbed_client()
+                if moteAddr in clients:
+                    data = self._cliCollector.get_delays(moteAddr)
+                    self._report['raw']['delay'][moteAddr] = data
+            else:
+                data = self._collector.get_delays()
+                self._report['raw']['delay']['general'] = data
+
+        return self._report['raw']['delay']
+
+    def _get_report_testbed(
+        self,
+        moteAddr: 'str',
+        subtitle: 'str'
+    ) -> 'dict':
+        super()._get_report_testbed(moteAddr, subtitle)
+        
+        if subtitle == 'client':
+            self._get_testbed_client()
+        elif subtitle == 'server':
+            self._get_testbed_server()
+        elif not subtitle:
+            self._get_testbed_client()
+            self._get_testbed_server()
+
+        return self._report['testbed']
