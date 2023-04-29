@@ -6,7 +6,7 @@ from lib.testbed_analysis import TestbedDataAnalyzer
 from lib.testbed_analysis import TestbedDataPersist
 
 
-class TestbedAnalysisRPC:
+class TestbedAnalysisEntity:
 
     def __init__(
         self,

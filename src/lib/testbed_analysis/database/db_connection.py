@@ -60,6 +60,25 @@ class InfluxDBConnection:
 
         self._queryApi = self._client.query_api()
 
+    def get_buckets(
+        self, 
+        bucketType: 'str' = None
+    ):
+        data = []
+
+        if self._bucketsApi:
+            buckets = self._bucketsApi.find_buckets()
+            buckets = buckets.buckets
+
+            for b in buckets:
+                if bucketType:
+                    if b.type == bucketType:
+                        data.append(b.name)
+                else:
+                    data.append(b.name)
+
+        return data
+
     def create_bucket(self, bucket_name: 'str'):
         ret = False
 

@@ -46,6 +46,15 @@ class TestbedGeneralDataCollector:
 
         return data
     
+    def get_testbeds(self) -> 'list':
+        ''' 
+            collects a list of executed (or in execution) testbeds.
+        '''
+                
+        data = self._testbed.database.get_buckets(bucketType='user')
+
+        return data
+    
     def get_motes(self) -> 'list':
         ''' 
             return: testbed general mote list.

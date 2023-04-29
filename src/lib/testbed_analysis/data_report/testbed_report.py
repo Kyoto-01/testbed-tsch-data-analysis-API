@@ -52,7 +52,8 @@ REPORT_FORMAT = {
     'testbed': {
         'name': '',
         'client': [],
-        'server': []
+        'server': [],
+        'testbed': []
     },
     'date': .0
 }
@@ -381,8 +382,6 @@ class TestbedReport(ABC):
     ):
         report = {}
 
-        report['date'] = self._report['date']
-
         for topic in topics:
             if not topic.endswith('/'):
                 topic += '/'
@@ -390,13 +389,17 @@ class TestbedReport(ABC):
             title, subtitle = topic.split('/')[:2]
 
             if self._is_topic_valid(topic):
-                report[title] = {}
+                if not title in report:
+                    report[title] = {}
 
                 if subtitle:
                     report[title][subtitle] = self._report[title][subtitle]
                 else:
                     report[title] = self._report[title]
         
+        if report:
+            report['date'] = self._report['date']
+    
         return report
     
     def get_report_by_topics(

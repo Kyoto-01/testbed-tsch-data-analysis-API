@@ -1,44 +1,47 @@
 #!/usr/bin/env python3
 
-import sys
-from pprint import pprint
+from flask import Flask, request
 
-from lib.testbed_analysis.database import InfluxDBConnection
-from lib.testbed_analysis import TestbedData
-from lib.testbed_analysis import TestbedClientsReport
-from lib.testbed_analysis import TestbedServersReport
-from lib.testbed_analysis import TestbedGeneralReport
-from rpc import TestbedAnalysisRPC
+from controller import ReportClientController
+from controller import ReportServerController
+from controller import ReportGeneralController
+
+from utils import config
 
 
-DATABASE_CONFIG_FILE_PATH = '../config.ini'
+conf = config.config_from_cmdline()
 
-TESTBED_NAME = 'testbed-71d1877d-356a-4757-9793-724c54c91bdf'
+app = Flask(__name__)
 
 
-database = InfluxDBConnection(DATABASE_CONFIG_FILE_PATH)
+@app.get('/client')
+def get_client_report():
+    req = request.json
+    controller = ReportClientController(req)
+    res = controller.get_report()
 
-testbed = TestbedData(
-    name=TESTBED_NAME,
-    database=database
+    return res
+
+
+@app.get('/server')
+def get_server_report():
+    req = request.json
+    controller = ReportServerController(req)
+    res = controller.get_report()
+
+    return res
+
+
+@app.get('/general')
+def get_general_report():
+    req = request.json
+    controller = ReportGeneralController(req)
+    res = controller.get_report()
+
+    return res
+
+
+app.run(
+    host=conf['addr'],
+    port=conf['port']
 )
-
-analyzerRPC = TestbedAnalysisRPC(testbed)
-clientReport = TestbedClientsReport(testbed)
-serverReport = TestbedServersReport(testbed)
-generalReport = TestbedGeneralReport(testbed)
-
-reportType, reportTopics = sys.argv[1], sys.argv[2].split(',')
-clientMote = 'fe8000000000000002124b0014b5d33a' 
-serverMote = 'fe8000000000000002124b0018e0b9f2'
-
-reportResponse = None
-
-if reportType == 'client':
-    reportResponse = clientReport.get_report_by_topics(clientMote, reportTopics)
-elif reportType == 'server':
-    reportResponse = serverReport.get_report_by_topics(serverMote, reportTopics)
-elif reportType == 'general':
-    reportResponse = generalReport.get_report_by_topics(None, reportTopics)
-
-pprint(reportResponse)

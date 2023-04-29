@@ -18,6 +18,13 @@ class TestbedGeneralReport(TestbedReport):
         self._srvCollector = TestbedServersDataCollector(testbed)
         self._collector = TestbedGeneralDataCollector(testbed)
 
+    def _get_testbed_testbed(self):
+        if not self._report['testbed']['testbed']:
+            data = self._collector.get_testbeds()
+            self._report['testbed']['testbed'] = data
+
+        return self._report['testbed']['testbed']
+    
     def _get_testbed_client(self):
         if not self._report['testbed']['client']:
             data = self._cliCollector.get_motes()
@@ -138,8 +145,11 @@ class TestbedGeneralReport(TestbedReport):
             self._get_testbed_client()
         elif subtitle == 'server':
             self._get_testbed_server()
+        elif subtitle == 'testbed':
+            self._get_testbed_testbed()
         elif not subtitle:
             self._get_testbed_client()
             self._get_testbed_server()
+            self._get_testbed_testbed()
 
         return self._report['testbed']

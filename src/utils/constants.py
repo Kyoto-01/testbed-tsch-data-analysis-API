@@ -1,0 +1,1 @@
+DATABASE_CONFIG_FILE_PATH = '../config.ini'
