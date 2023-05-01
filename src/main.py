@@ -5,7 +5,7 @@ from flask import Flask, request
 from controller import ReportClientController
 from controller import ReportServerController
 from controller import ReportGeneralController
-
+from controller import RPCAnalysisController
 from utils import config
 
 
@@ -37,6 +37,15 @@ def get_general_report():
     req = request.json
     controller = ReportGeneralController(req)
     res = controller.get_report()
+
+    return res
+
+
+@app.get('/rpc/analysis/update/all')
+def get_analysis_update_all():
+    req = request.json
+    controller = RPCAnalysisController(req)
+    res = controller.update_analysis_all()
 
     return res
 

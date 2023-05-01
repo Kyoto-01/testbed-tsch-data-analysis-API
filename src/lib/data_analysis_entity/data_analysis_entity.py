@@ -16,7 +16,7 @@ class TestbedAnalysisEntity:
         self._dataPersist = TestbedDataPersist(testbed)
         self._prevClientsTxpktCount = {}
 
-    def analyze_clients_throughput(self):
+    def analyze_clients_throughput(self) -> 'bool':
         allReport = TestbedGeneralReport(self._testbed)
         report = TestbedClientsReport(self._testbed)
         clients = allReport._get_testbed_client()
@@ -47,7 +47,9 @@ class TestbedAnalysisEntity:
         data = {'throughput': data}
         self._dataPersist.persist('general', None, None, data)
 
-    def analyze_servers_throughput(self):
+        return True
+
+    def analyze_servers_throughput(self) -> 'bool':
         allReport = TestbedGeneralReport(self._testbed)
         report = TestbedServersReport(self._testbed)
         servers = allReport._get_testbed_server()
@@ -70,7 +72,9 @@ class TestbedAnalysisEntity:
             data = {'throughput': data}
             self._dataPersist.persist('server_general', s, None, data)
 
-    def analyze_clients_pdr(self):
+        return True
+
+    def analyze_clients_pdr(self) -> 'bool':
         allReport = TestbedGeneralReport(self._testbed)
         report = TestbedClientsReport(self._testbed)
         clients = allReport._get_testbed_client()
@@ -102,7 +106,9 @@ class TestbedAnalysisEntity:
         data = {'pdr': data}
         self._dataPersist.persist('general', None, None, data)
 
-    def analyze_clients_per(self):
+        return True
+
+    def analyze_clients_per(self) -> 'bool':
         allReport = TestbedGeneralReport(self._testbed)
         report = TestbedClientsReport(self._testbed)
         clients = allReport._get_testbed_client()
@@ -134,7 +140,9 @@ class TestbedAnalysisEntity:
         data = {'per': data}
         self._dataPersist.persist('general', None, None, data)
 
-    def analyze_clients_delay(self):
+        return True
+
+    def analyze_clients_delay(self, txpktOffsets: 'dict') -> 'dict':
         allReport = TestbedGeneralReport(self._testbed)
         cliReport = TestbedClientsReport(self._testbed)
         srvReport = TestbedServersReport(self._testbed)
@@ -151,8 +159,8 @@ class TestbedAnalysisEntity:
 
             delaysMote = []
 
-            if not c in self._prevClientsTxpktCount:
-                self._prevClientsTxpktCount[c] = {}
+            if not c in txpktOffsets:
+                txpktOffsets[c] = {}
 
             # delays per link
             for p in peers:
@@ -163,14 +171,14 @@ class TestbedAnalysisEntity:
                 linkRxpkts = srvReport._get_raw_packet(p.replace('fd00', 'fe80'))
                 linkRxpkts = linkRxpkts[c.replace('fe80', 'fd00')]
 
-                if p not in self._prevClientsTxpktCount[c]:
-                    self._prevClientsTxpktCount[c][p] = 0
-                    
-                data = TestbedDataAnalyzer.get_delays(
-                    linkTxpkts[self._prevClientsTxpktCount[c][p]:], linkRxpkts
-                )
+                if p not in txpktOffsets[c]:
+                    txpktOffsets[c][p] = 0
 
-                self._prevClientsTxpktCount[c][p] = len(linkTxpkts)
+                data = TestbedDataAnalyzer.get_delays(
+                    linkTxpkts[txpktOffsets[c][p]:], linkRxpkts
+                )
+                
+                txpktOffsets[c][p] = len(linkTxpkts)
 
                 for d in data:
                     delaysMote.append({'value': d})
@@ -189,3 +197,5 @@ class TestbedAnalysisEntity:
         data = TestbedDataAnalyzer.get_mean(delaysGeneral)
         data = {'delay': data}
         self._dataPersist.persist('general', None, None, data)
+
+        return txpktOffsets
