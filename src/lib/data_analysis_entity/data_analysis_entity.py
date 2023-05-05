@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from lib.testbed_analysis import TestbedData
 from lib.testbed_analysis import TestbedClientsReport
 from lib.testbed_analysis import TestbedServersReport
@@ -14,9 +16,10 @@ class TestbedAnalysisEntity:
     ):
         self._testbed = testbed
         self._dataPersist = TestbedDataPersist(testbed)
-        self._prevClientsTxpktCount = {}
 
     def analyze_clients_throughput(self) -> 'bool':
+        time = datetime.utcnow()
+
         allReport = TestbedGeneralReport(self._testbed)
         report = TestbedClientsReport(self._testbed)
         clients = allReport._get_testbed_client()
@@ -34,22 +37,24 @@ class TestbedAnalysisEntity:
                 data = TestbedDataAnalyzer.get_packet_throughput(v)
                 throughputsMote.append({'value': data})
                 data = {'throughput': data}
-                self._dataPersist.persist('client', c, k, data)
+                self._dataPersist.persist('client', c, k, data, time)
 
             # throughput per mote
             data = TestbedDataAnalyzer.get_mean(throughputsMote)
             throughputsGeneral.append({'value': data})
             data = {'throughput': data}
-            self._dataPersist.persist('client_general', c, None, data)
+            self._dataPersist.persist('client_general', c, None, data, time)
 
         # throughput general
         data = TestbedDataAnalyzer.get_mean(throughputsGeneral)
         data = {'throughput': data}
-        self._dataPersist.persist('general', None, None, data)
+        self._dataPersist.persist('general', None, None, data, time)
 
         return True
 
     def analyze_servers_throughput(self) -> 'bool':
+        time = datetime.utcnow()
+        
         allReport = TestbedGeneralReport(self._testbed)
         report = TestbedServersReport(self._testbed)
         servers = allReport._get_testbed_server()
@@ -65,16 +70,18 @@ class TestbedAnalysisEntity:
                 data = TestbedDataAnalyzer.get_packet_throughput(v)
                 throughputsMote.append({'value': data})
                 data = {'throughput': data}
-                self._dataPersist.persist('server', s, k, data)
+                self._dataPersist.persist('server', s, k, data, time)
 
             # throughput per mote
             data = TestbedDataAnalyzer.get_mean(throughputsMote)
             data = {'throughput': data}
-            self._dataPersist.persist('server_general', s, None, data)
+            self._dataPersist.persist('server_general', s, None, data, time)
 
         return True
 
     def analyze_clients_pdr(self) -> 'bool':
+        time = datetime.utcnow()
+        
         allReport = TestbedGeneralReport(self._testbed)
         report = TestbedClientsReport(self._testbed)
         clients = allReport._get_testbed_client()
@@ -93,22 +100,24 @@ class TestbedAnalysisEntity:
                 data = TestbedDataAnalyzer.get_PDR(pktcount[k], ackcount[k])
                 pdrsMote.append({'value': data})
                 data = {'pdr': data}
-                self._dataPersist.persist('client', c, k, data)
+                self._dataPersist.persist('client', c, k, data, time)
 
             # PDR per mote
             data = TestbedDataAnalyzer.get_mean(pdrsMote)
             pdrsGeneral.append({'value': data})
             data = {'pdr': data}
-            self._dataPersist.persist('client_general', c, None, data)
+            self._dataPersist.persist('client_general', c, None, data, time)
 
         # PDR general
         data = TestbedDataAnalyzer.get_mean(pdrsGeneral)
         data = {'pdr': data}
-        self._dataPersist.persist('general', None, None, data)
+        self._dataPersist.persist('general', None, None, data, time)
 
         return True
 
     def analyze_clients_per(self) -> 'bool':
+        time = datetime.utcnow()
+        
         allReport = TestbedGeneralReport(self._testbed)
         report = TestbedClientsReport(self._testbed)
         clients = allReport._get_testbed_client()
@@ -127,22 +136,24 @@ class TestbedAnalysisEntity:
                 data = TestbedDataAnalyzer.get_PER(pktcount[k], ackcount[k])
                 persMote.append({'value': data})
                 data = {'per': data}
-                self._dataPersist.persist('client', c, k, data)
+                self._dataPersist.persist('client', c, k, data, time)
 
             # PER per mote
             data = TestbedDataAnalyzer.get_mean(persMote)
             persGeneral.append({'value': data})
             data = {'per': data}
-            self._dataPersist.persist('client_general', c, None, data)
+            self._dataPersist.persist('client_general', c, None, data, time)
 
         # PER general
         data = TestbedDataAnalyzer.get_mean(persGeneral)
         data = {'per': data}
-        self._dataPersist.persist('general', None, None, data)
+        self._dataPersist.persist('general', None, None, data, time)
 
         return True
 
     def analyze_clients_delay(self, txpktOffsets: 'dict') -> 'dict':
+        time = datetime.utcnow()
+        
         allReport = TestbedGeneralReport(self._testbed)
         cliReport = TestbedClientsReport(self._testbed)
         srvReport = TestbedServersReport(self._testbed)
@@ -183,7 +194,7 @@ class TestbedAnalysisEntity:
                 for d in data:
                     delaysMote.append({'value': d})
                     d = {'delay': d}
-                    self._dataPersist.persist('client', c, p, d)
+                    self._dataPersist.persist('client', c, p, d, time)
 
                 delaysMote = delaysMote + linkPrevDelays
 
@@ -191,11 +202,11 @@ class TestbedAnalysisEntity:
             data = TestbedDataAnalyzer.get_mean(delaysMote)
             delaysGeneral.append({'value': data})
             data = {'delay': data}
-            self._dataPersist.persist('client_general', c, None, data)
+            self._dataPersist.persist('client_general', c, None, data, time)
 
         # delays general
         data = TestbedDataAnalyzer.get_mean(delaysGeneral)
         data = {'delay': data}
-        self._dataPersist.persist('general', None, None, data)
+        self._dataPersist.persist('general', None, None, data, time)
 
         return txpktOffsets

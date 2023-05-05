@@ -15,7 +15,8 @@ class TestbedDataPersist:
         moteType: 'str',
         moteAddr: 'str', 
         peerAddr: 'str', 
-        data: 'dict'
+        data: 'dict',
+        time = None
     ):
         moteType = moteType.lower()
         
@@ -34,7 +35,8 @@ class TestbedDataPersist:
             bucket=self._testbed.name,
             measurement=moteType,
             tags=tags,
-            fields=data
+            fields=data,
+            time=time
         )
 
         

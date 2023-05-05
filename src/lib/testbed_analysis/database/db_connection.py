@@ -97,14 +97,18 @@ class InfluxDBConnection:
         bucket: 'str',
         measurement: 'str',
         tags: 'dict' = {},
-        fields: 'dict' = {}
+        fields: 'dict' = {},
+        time: 'datetime' = None
     ):
+        if not time:
+            time = datetime.utcnow()
+            
         if self._writeApi:
             data = {
                 'measurement': measurement,
                 'tags': tags,
                 'fields': fields,
-                'time': datetime.utcnow()
+                'time': time
             }
 
             self.create_bucket(bucket)
