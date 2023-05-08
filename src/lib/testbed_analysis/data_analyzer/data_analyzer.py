@@ -52,8 +52,9 @@ class TestbedDataAnalyzer:
             pktcount = len(pkts)
             time = TestbedDataAnalyzer.get_uptime(pkts)
 
-            # throughput in pps (packets per second)
-            throughput = pktcount / time
+            if time > 0:
+                # throughput in pps (packets per second)
+                throughput = pktcount / time
 
         return throughput
 
