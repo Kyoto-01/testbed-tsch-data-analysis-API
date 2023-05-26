@@ -14,7 +14,7 @@ conf = config.config_from_cmdline()
 app = Flask(__name__)
 
 
-@app.get('/api/report/client')
+@app.post('/api/report/client')
 def get_client_report():
     req = request.json
     controller = ReportClientController(req)
@@ -23,7 +23,7 @@ def get_client_report():
     return res
 
 
-@app.get('/api/report/server')
+@app.post('/api/report/server')
 def get_server_report():
     req = request.json
     controller = ReportServerController(req)
@@ -32,7 +32,7 @@ def get_server_report():
     return res
 
 
-@app.get('/api/report/general')
+@app.post('/api/report/general')
 def get_general_report():
     req = request.json
     controller = ReportGeneralController(req)
