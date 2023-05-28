@@ -24,6 +24,27 @@ class TestbedGeneralReport(TestbedReport):
             self._report['testbed']['testbed'] = data
 
         return self._report['testbed']['testbed']
+
+    def _get_testbed_status(self):
+        if not self._report['testbed']['status']:
+            data = self._collector.get_status()
+            self._report['testbed']['status'] = data
+
+        return self._report['testbed']['status']
+
+    def _get_testbed_start(self):
+        if not self._report['testbed']['start']:
+            data = self._collector.get_start()
+            self._report['testbed']['start'] = data
+
+        return self._report['testbed']['start']
+
+    def _get_testbed_stop(self):
+        if not self._report['testbed']['stop']:
+            data = self._collector.get_stop()
+            self._report['testbed']['stop'] = data
+
+        return self._report['testbed']['stop']
     
     def _get_testbed_client(self):
         if not self._report['testbed']['client']:
@@ -147,9 +168,18 @@ class TestbedGeneralReport(TestbedReport):
             self._get_testbed_server()
         elif subtitle == 'testbed':
             self._get_testbed_testbed()
+        elif subtitle == 'status':
+            self._get_testbed_status()
+        elif subtitle == 'start':
+            self._get_testbed_start()
+        elif subtitle == 'stop':
+            self._get_testbed_stop()
         elif not subtitle:
             self._get_testbed_client()
             self._get_testbed_server()
             self._get_testbed_testbed()
+            self._get_testbed_status()
+            self._get_testbed_start()
+            self._get_testbed_stop()
 
         return self._report['testbed']

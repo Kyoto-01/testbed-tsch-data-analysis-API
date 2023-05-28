@@ -48,13 +48,71 @@ class TestbedGeneralDataCollector:
     
     def get_testbeds(self) -> 'list':
         ''' 
-            collects a list of executed (or in execution) testbeds.
+            return: list of executed (or in execution) testbeds.
         '''
                 
         data = self._testbed.database.get_buckets(bucketType='user')
 
         return data
     
+    def get_status(self) -> 'str':
+        '''
+            return: testbed status (start | stop).
+        '''
+
+        data = self._get_list('status')
+
+        if data:
+
+            data = data[len(data) - 1]
+            data = data['value']
+
+        else:
+            data = None
+
+        return data
+    
+    def get_start(self) -> 'str':
+        '''
+            return: testbed start time.
+        '''
+
+        data = self._get_list('status')
+
+        if data:
+            data = data[0]
+
+            if data['value'] == 'start':
+                data = data['time'].timestamp()
+            else:
+                data = None
+
+        else:
+            data = None
+
+        return data
+    
+    def get_stop(self) -> 'str':
+        '''
+            return: testbed stop time.
+        '''
+
+        data = self._get_list('status')
+
+        if data:
+
+            data = data[len(data) - 1]
+
+            if data['value'] == 'stop':
+                data = data['time'].timestamp()
+            else:
+                data = None
+        
+        else:
+            data = None
+
+        return data
+
     def get_motes(self) -> 'list':
         ''' 
             return: testbed general mote list.

@@ -46,7 +46,8 @@
         "name": "",
         "client": [],
         "server": [],
-        "testbed": []
+        "testbed": [],
+        "status": ""
     },
     "date": .0
 }

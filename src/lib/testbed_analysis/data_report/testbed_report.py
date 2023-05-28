@@ -53,7 +53,10 @@ REPORT_FORMAT = {
         'name': '',
         'client': [],
         'server': [],
-        'testbed': []
+        'testbed': [],
+        'status': '',
+        'start': .0,
+        'stop': .0
     },
     'date': .0
 }
